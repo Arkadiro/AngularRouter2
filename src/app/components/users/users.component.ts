@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/models/User';
-import { userData } from 'src/app/models/Data';
+//import { userData } from 'src/app/models/Data';
 import { NgForm } from '@angular/forms';
+import { UserService } from 'src/app/services/user.service.';
+
 
 @Component({
   selector: 'app-users',
@@ -14,11 +16,25 @@ export class UsersComponent implements OnInit {
   loaded: boolean = true;
   enabled: boolean = true;
   showUserForm: boolean = false;
+  data:any;
 
-  constructor() { }
+  constructor( private userService: UserService) { }
 
   ngOnInit() {
-    this.users = userData;
+    this.userService.getData()
+      .subscribe(
+        (data) => {
+        this.data = data
+        console.log(this.data);
+        }
+      )
+    this.userService.getUsers()
+        .subscribe(
+          (users) =>{
+            this.users = users;
+            this.loaded = true;
+          }
+        )
   }
 
   onAddUser(){
@@ -32,8 +48,8 @@ export class UsersComponent implements OnInit {
     })
   }
   addNewUser(form: NgForm){
-    console.log(form);
-    this.users.push({
+    //console.log(form);
+    this.userService.addUser({
       id: this.users.length+1,
       firstName: form.value.firstName,
       lastName: form.value.lastName,
@@ -41,6 +57,7 @@ export class UsersComponent implements OnInit {
       registered: new Date(),
       hide: true
     })
+    console.log(this.userService.getUsers())
     form.reset()
   }
 
